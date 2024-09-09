@@ -5001,7 +5001,6 @@ if (!process.env.GITHUB_TOKEN) {
 const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
 (function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("start executing...");
         const payload = github.context.payload;
         // Ensure we're handling a pull_request event
         if (!payload.pull_request) {
@@ -5019,6 +5018,7 @@ const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
         console.log(ref);
         console.log(sha);
         const commits = yield utils_1.getCommitsFromPayload(octokit, payload);
+        console.log(commits);
         const files = utils_1.updatedFiles(commits);
         const plantumlCodes = utils_1.retrieveCodes(files);
         let tree = [];
@@ -32589,18 +32589,14 @@ function puFromMd(markdown) {
 }
 function getCommitsFromPayload(octokit, payload) {
     return __awaiter(this, void 0, void 0, function* () {
-        const commits = payload.commits;
+        const commitsUrl = payload.pull_request.commits_url;
         const owner = payload.repository.owner.login;
         const repo = payload.repository.name;
-        console.log("getCommitsFromPayload...");
-        console.dir(payload);
-        console.log(commits);
-        console.log(owner);
-        console.log(repo);
-        const res = yield Promise.all(commits.map(commit => octokit.repos.getCommit({
-            owner, repo, ref: commit.id
+        const { data: commits } = yield octokit.request(`GET ${commitsUrl}`);
+        const commitDetails = yield Promise.all(commits.map(commit => octokit.repos.getCommit({
+            owner, repo, ref: commit.sha
         })));
-        return res.map(res => res.data);
+        return commitDetails.map(res => res.data);
     });
 }
 exports.getCommitsFromPayload = getCommitsFromPayload;

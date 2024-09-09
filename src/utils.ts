@@ -80,20 +80,16 @@ function puFromMd(markdown) {
 }
 
 export async function getCommitsFromPayload(octokit, payload) {
-    const commits = payload.commits;
+    const commitsUrl = payload.pull_request.commits_url;
     const owner   = payload.repository.owner.login;
     const repo    = payload.repository.name;
 
-    console.log("getCommitsFromPayload...")
-    console.dir(payload)
-    console.log(commits)
-    console.log(owner)
-    console.log(repo)
+    const { data: commits } = await octokit.request(`GET ${commitsUrl}`);
 
-    const res = await Promise.all(commits.map(commit => octokit.repos.getCommit({
-        owner, repo, ref: commit.id
+    const commitDetails = await Promise.all(commits.map(commit => octokit.repos.getCommit({
+        owner, repo, ref: commit.sha
     })));
-    return res.map(res => (<any>res).data);
+    return commitDetails.map(res => (<any>res).data);
 }
 
 export function updatedFiles(commits) {

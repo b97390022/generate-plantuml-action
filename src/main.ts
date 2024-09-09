@@ -28,7 +28,6 @@ if (!process.env.GITHUB_TOKEN) {
 const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
 
 (async function main() {
-    console.log("start executing...")
     const payload = github.context.payload;
 
     // Ensure we're handling a pull_request event
@@ -51,6 +50,7 @@ const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
     console.log(sha)
 
     const commits = await getCommitsFromPayload(octokit, payload);
+    console.log(commits)
     const files = updatedFiles(commits);
     const plantumlCodes = retrieveCodes(files);
 
