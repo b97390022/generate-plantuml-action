@@ -32593,6 +32593,7 @@ function getCommitsFromPayload(octokit, payload) {
         const owner = payload.repository.owner.login;
         const repo = payload.repository.name;
         console.log("getCommitsFromPayload...");
+        console.dir(payload);
         console.log(commits);
         console.log(owner);
         console.log(repo);
