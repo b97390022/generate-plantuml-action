@@ -44,7 +44,12 @@ const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
     const repo    = payload.repository.name;
     const ref = payload.pull_request.head.ref;
     const sha = payload.pull_request.head.sha;
-    console.log(123123)
+
+    console.log(owner)
+    console.log(repo)
+    console.log(ref)
+    console.log(sha)
+
     const commits = await getCommitsFromPayload(octokit, payload);
     const files = updatedFiles(commits);
     const plantumlCodes = retrieveCodes(files);

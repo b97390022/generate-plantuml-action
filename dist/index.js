@@ -5014,7 +5014,10 @@ const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
         const repo = payload.repository.name;
         const ref = payload.pull_request.head.ref;
         const sha = payload.pull_request.head.sha;
-        console.log(123123);
+        console.log(owner);
+        console.log(repo);
+        console.log(ref);
+        console.log(sha);
         const commits = yield utils_1.getCommitsFromPayload(octokit, payload);
         const files = utils_1.updatedFiles(commits);
         const plantumlCodes = utils_1.retrieveCodes(files);
@@ -32589,6 +32592,10 @@ function getCommitsFromPayload(octokit, payload) {
         const commits = payload.commits;
         const owner = payload.repository.owner.login;
         const repo = payload.repository.name;
+        console.log("getCommitsFromPayload...");
+        console.log(commits);
+        console.log(owner);
+        console.log(repo);
         const res = yield Promise.all(commits.map(commit => octokit.repos.getCommit({
             owner, repo, ref: commit.id
         })));

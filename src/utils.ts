@@ -84,6 +84,11 @@ export async function getCommitsFromPayload(octokit, payload) {
     const owner   = payload.repository.owner.login;
     const repo    = payload.repository.name;
 
+    console.log("getCommitsFromPayload...")
+    console.log(commits)
+    console.log(owner)
+    console.log(repo)
+
     const res = await Promise.all(commits.map(commit => octokit.repos.getCommit({
         owner, repo, ref: commit.id
     })));
