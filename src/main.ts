@@ -44,17 +44,9 @@ const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
     const ref = payload.pull_request.head.ref;
     const sha = payload.pull_request.head.sha;
 
-    console.log(owner)
-    console.log(repo)
-    console.log(ref)
-    console.log(sha)
-
     const commits = await getCommitsFromPayload(octokit, payload);
-    console.log('commits', commits)
     const files = updatedFiles(commits);
-    console.log('files', files)
     const plantumlCodes = retrieveCodes(files);
-    console.log('plantumlCodes', plantumlCodes)
 
     let tree: any[] = [];
     for (const plantumlCode of plantumlCodes) {
@@ -109,7 +101,7 @@ const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
         sha: createdCommitRes.data.sha,
     });
 
-    // console.log(`${tree.map(t => t.path).join("\n")}\nAbove files are generated.`);
+    console.log(`${tree.map(t => t.path).join("\n")}\nAbove files are generated.`)
 })().catch(e => {
     core.setFailed(e);
 });
