@@ -28,14 +28,23 @@ if (!process.env.GITHUB_TOKEN) {
 const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
 
 (async function main() {
+    console.log("start executing...")
     const payload = github.context.payload;
-    const ref     = payload.ref;
+
+    // Ensure we're handling a pull_request event
+    if (!payload.pull_request) {
+        throw new Error('This action only works with pull_request events.');
+    }
+
     if (!payload.repository) {
         throw new Error();
     }
+
     const owner   = payload.repository.owner.login;
     const repo    = payload.repository.name;
-
+    const ref = payload.pull_request.head.ref;
+    const sha = payload.pull_request.head.sha;
+    console.log(123123)
     const commits = await getCommitsFromPayload(octokit, payload);
     const files = updatedFiles(commits);
     const plantumlCodes = retrieveCodes(files);
@@ -55,11 +64,11 @@ const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
             encoding: 'base64',
         });
 
-        const sha = await octokit.repos.getContents({
+        const existingFileSha = await octokit.repos.getContents({
             owner, repo, ref, path: p
         }).then(res => (<any>res.data).sha).catch(e => undefined);
 
-        if (blobRes.data.sha !== sha) {
+        if (blobRes.data.sha !== existingFileSha) {
             tree = tree.concat({
                 path: p.toString(),
                 mode: "100644",
@@ -74,25 +83,26 @@ const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
         return;
     }
 
+    const baseTree = commits[commits.length - 1].commit.tree.sha;
     const treeRes = await octokit.git.createTree({
         owner, repo, tree,
-        base_tree: commits[commits.length - 1].commit.tree.sha,
+        base_tree: baseTree,
     });
 
     const createdCommitRes = await octokit.git.createCommit({
         owner, repo,
         message: commitMessage,
-        parents: [ commits[commits.length - 1].sha ],
+        parents: [ sha ],
         tree: treeRes.data.sha,
     });
 
     const updatedRefRes = await octokit.git.updateRef({
         owner, repo,
-        ref: ref.replace(/^refs\//, ''),
+        ref: `heads/${ref}`,
         sha: createdCommitRes.data.sha,
     });
 
-    console.log(`${tree.map(t => t.path).join("\n")}\nAbove files are generated.`);
+    // console.log(`${tree.map(t => t.path).join("\n")}\nAbove files are generated.`);
 })().catch(e => {
     core.setFailed(e);
 });
