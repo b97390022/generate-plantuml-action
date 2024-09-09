@@ -29,7 +29,7 @@ const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
 
 (async function main() {
     const payload = github.context.payload;
-
+    console.dir(payload)
     // Ensure we're handling a pull_request event
     if (!payload.pull_request) {
         throw new Error('This action only works with pull_request events.');
