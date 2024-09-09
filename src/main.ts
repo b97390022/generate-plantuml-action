@@ -50,9 +50,11 @@ const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
     console.log(sha)
 
     const commits = await getCommitsFromPayload(octokit, payload);
-    console.log(commits)
+    console.log('commits', commits)
     const files = updatedFiles(commits);
+    console.log('files', files)
     const plantumlCodes = retrieveCodes(files);
+    console.log('plantumlCodes', plantumlCodes)
 
     let tree: any[] = [];
     for (const plantumlCode of plantumlCodes) {
